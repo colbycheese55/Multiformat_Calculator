@@ -1,5 +1,6 @@
 import customtkinter as ctk
-from backend import calculate, generateOutput, HistoryLog
+from tkinter import messagebox as mb
+from backend import calculate, generateOutput, HistoryLog, getReadme
 
 
 root = ctk.CTk()
@@ -39,9 +40,6 @@ def clear(*args):
     writeResultBox("")
     entryBox.delete("1.0", ctk.END)
 
-def displayHelp():
-    pass
-
 
 # Textboxes and labels
 padding = 5
@@ -68,7 +66,7 @@ btnParams = {"width": 70, "height": 3, "font": labelFont}
 clearBtn = ctk.CTkButton(root, text="Clear", **btnParams, command=clear)
 clearBtn.grid(row=4, rowspan=1, column=6, columnspan=2)
 
-helpBtn = ctk.CTkButton(root, text="Help", **btnParams)
+helpBtn = ctk.CTkButton(root, text="Help", **btnParams, command=lambda: mb.showinfo("Help", getReadme()))
 helpBtn.grid(row=8, rowspan=1, column=6, columnspan=2)
 
 histBtn = ctk.CTkCheckBox(root, text="Show History", **btnParams, command=toggleHistory)

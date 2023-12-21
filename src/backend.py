@@ -88,3 +88,14 @@ class HistoryLog:
     
     def getHistory(this) -> str:
         return this.history
+    
+
+def getReadme() -> str:
+    try:
+        text = None
+        with open("README.md") as readme:
+            text = readme.read()
+        index = text.find("How to use")
+        return text[index:]
+    except Exception as e:
+        return "COULD NOT OPEN README"
