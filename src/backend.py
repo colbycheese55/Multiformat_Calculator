@@ -4,7 +4,9 @@ from converter import nonint2decimal, bin2float, bin2signedInt, reportFloat, rep
 
 
 def calculate(expression: str) -> (float | int, dict, bool | str):
-    expression = expression.lower()
+    expression = expression.lower().replace("\n", "")
+    if expression == "":
+        return None, None, "No expression entered"
 
     # Step 1: get any flags
     expression, flags = parseFlags(expression)

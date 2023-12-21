@@ -1,9 +1,39 @@
 import customtkinter as ctk
+from backend import calculate, generateOutput
 
 
 root = ctk.CTk()
 root.geometry("600x500")
 root.title("Multiformat Calculator")
+
+# Functions
+def solve(*args):
+    if len(args) > 0: # delete the extra \n
+        entryBox.delete("end-1c")
+    expression = entryBox.get("1.0", ctk.END)
+    result, flags, error = calculate(expression)
+    if error is not False:
+        writeResultBox(f"Error: {error}")
+        return
+    output = generateOutput(result, flags)
+    writeResultBox(output)
+
+def toggleHistory(*args):
+    pass
+
+def writeResultBox(text: str):
+    resultBox.configure(state=ctk.NORMAL)
+    resultBox.delete("1.0", ctk.END)
+    resultBox.insert(ctk.END, text)
+    resultBox.configure(state=ctk.DISABLED)
+
+def clear(*args):
+    writeResultBox("")
+    entryBox.delete("1.0", ctk.END)
+
+def displayHelp():
+    pass
+
 
 # Textboxes and labels
 padding = 5
@@ -27,7 +57,7 @@ resultLabel.grid(row=5, rowspan=1, column=0, columnspan=5)
 # Buttons
 btnParams = {"width": 70, "height": 3, "font": labelFont}
 
-clearBtn = ctk.CTkButton(root, text="Clear", **btnParams)
+clearBtn = ctk.CTkButton(root, text="Clear", **btnParams, command=clear)
 clearBtn.grid(row=4, rowspan=1, column=6, columnspan=2)
 
 helpBtn = ctk.CTkButton(root, text="Help", **btnParams)
@@ -36,10 +66,14 @@ helpBtn.grid(row=8, rowspan=1, column=6, columnspan=2)
 histBtn = ctk.CTkCheckBox(root, text="Show History", **btnParams)
 histBtn.grid(row=7, rowspan=1, column=7, columnspan=2)
 
-solveBtn = ctk.CTkButton(root, text="Solve", **btnParams)
+solveBtn = ctk.CTkButton(root, text="Solve", **btnParams, command=solve)
 solveBtn.grid(row=2, rowspan=1, column=6, columnspan=2)
 
 
+# Key Binds
+root.bind("<Return>", solve)
+root.bind("<Control-d>", clear)
+root.bind("<Control-w>", lambda _: root.destroy())
 
 
 
