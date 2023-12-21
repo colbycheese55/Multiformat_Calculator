@@ -29,8 +29,8 @@ def bin2signedInt(entire: str, flags: dict) -> (str, bool | str):
     if error != False:
         return None, error
     val = int(binary, 2)
-    if binary[0] == "1":
-        return str(val - 2 ** len(binary)), False
+    if val >= 2**(flags["signlength"]-1):
+        return str(val - 2 ** flags["signlength"]), False
     else:
         return str(val), False
 
