@@ -74,3 +74,17 @@ def generateOutput(val: int | float, flags: dict) -> (str):
     elif flags["mode"] == "float":
         out += reportFloat(val, flags)
     return out
+
+
+class HistoryLog:
+    def __init__(this) -> None:
+        this.lastVal = None
+        this.history = "START OF HISTORY"
+    
+    def addEntry(this, report: str, val: int | float, expression: str) -> None:
+        if val != this.lastVal:
+            this.history = f"{expression}\n{report}\n{'_'*43}{this.history}"
+            this.lastVal = val
+    
+    def getHistory(this) -> str:
+        return this.history

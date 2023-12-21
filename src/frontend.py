@@ -1,10 +1,12 @@
 import customtkinter as ctk
-from backend import calculate, generateOutput
+from backend import calculate, generateOutput, HistoryLog
 
 
 root = ctk.CTk()
 root.geometry("600x500")
 root.title("Multiformat Calculator")
+history = HistoryLog()
+showHistory = False
 
 # Functions
 def solve(*args):
@@ -16,10 +18,15 @@ def solve(*args):
         writeResultBox(f"Error: {error}")
         return
     output = generateOutput(result, flags)
+    history.addEntry(output, result, expression)
+    output = history.getHistory() if showHistory is True else output
     writeResultBox(output)
 
 def toggleHistory(*args):
-    pass
+    global showHistory
+    showHistory = not showHistory
+    text = history.getHistory() if showHistory is True else ""
+    writeResultBox(text)
 
 def writeResultBox(text: str):
     resultBox.configure(state=ctk.NORMAL)
@@ -63,7 +70,7 @@ clearBtn.grid(row=4, rowspan=1, column=6, columnspan=2)
 helpBtn = ctk.CTkButton(root, text="Help", **btnParams)
 helpBtn.grid(row=8, rowspan=1, column=6, columnspan=2)
 
-histBtn = ctk.CTkCheckBox(root, text="Show History", **btnParams)
+histBtn = ctk.CTkCheckBox(root, text="Show History", **btnParams, command=toggleHistory)
 histBtn.grid(row=7, rowspan=1, column=7, columnspan=2)
 
 solveBtn = ctk.CTkButton(root, text="Solve", **btnParams, command=solve)
@@ -76,8 +83,4 @@ root.bind("<Control-d>", clear)
 root.bind("<Control-w>", lambda _: root.destroy())
 
 
-
-
-
 root.mainloop()
-
