@@ -83,7 +83,7 @@ class HistoryLog:
     
     def addEntry(this, report: str, val: int | float, expression: str) -> None:
         if val != this.lastVal:
-            this.history = f"{expression}\n{report}\n{'_'*43}{this.history}"
+            this.history = f"{expression}\n{report}\n{'_'*40}\n{this.history}"
             this.lastVal = val
     
     def getHistory(this) -> str:
