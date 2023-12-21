@@ -1,0 +1,49 @@
+import customtkinter as ctk
+
+
+root = ctk.CTk()
+root.geometry("600x500")
+root.title("Multiformat Calculator")
+
+# Textboxes and labels
+padding = 5
+labelFont = ("Franklin Gothic Heavy", 22)
+textFont = ("Calibri", 17)
+
+entryBox = ctk.CTkTextbox(root, width=400, height=100, font=textFont)
+entryBox.grid(row=2, rowspan=3, column=0, columnspan=5, padx=padding, pady=padding)
+
+resultBox = ctk.CTkTextbox(root, width=400, height=300, font=textFont)
+resultBox.grid(row=6, rowspan=9, column=0, columnspan=5, padx=padding, pady=padding)
+resultBox.configure(state=ctk.DISABLED)
+
+entryLabel = ctk.CTkLabel(root, text="Enter Expression", font=labelFont)
+entryLabel.grid(row=1, rowspan=1, column=0, columnspan=5)
+
+resultLabel = ctk.CTkLabel(root, text="Results", font=labelFont)
+resultLabel.grid(row=5, rowspan=1, column=0, columnspan=5)
+
+
+# Buttons
+btnParams = {"width": 70, "height": 3, "font": labelFont}
+
+clearBtn = ctk.CTkButton(root, text="Clear", **btnParams)
+clearBtn.grid(row=4, rowspan=1, column=6, columnspan=2)
+
+helpBtn = ctk.CTkButton(root, text="Help", **btnParams)
+helpBtn.grid(row=8, rowspan=1, column=6, columnspan=2)
+
+histBtn = ctk.CTkCheckBox(root, text="Show History", **btnParams)
+histBtn.grid(row=7, rowspan=1, column=7, columnspan=2)
+
+solveBtn = ctk.CTkButton(root, text="Solve", **btnParams)
+solveBtn.grid(row=2, rowspan=1, column=6, columnspan=2)
+
+
+
+
+
+
+
+root.mainloop()
+
