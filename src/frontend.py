@@ -11,10 +11,10 @@ showHistory = False
 
 # Functions
 def solve(*args):
-    expression = entryBox.get("1.0", ctk.END)
+    expression = entryBox.get("1.0", ctk.END).replace("\n", "")
     if len(args) > 0: # delete the extra \n
         entryBox.delete("1.0", ctk.END)
-        entryBox.insert(ctk.END, expression.replace("\n", ""))
+        entryBox.insert(ctk.END, expression)
     result, flags, error = calculate(expression)
     if error is not False:
         writeResultBox(f"Error: {error}")
