@@ -29,7 +29,9 @@ def bin2signedInt(entire: str, flags: dict) -> (str, bool | str):
     if error != False:
         return None, error
     val = int(binary, 2)
-    if val >= 2**(flags["signlength"]-1):
+    if val >= 2**(flags["signlength"]):
+        return None, f"{entire} is too many bits"
+    elif val >= 2**(flags["signlength"]-1):
         return str(val - 2 ** flags["signlength"]), False
     else:
         return str(val), False
@@ -55,11 +57,13 @@ def reportSignedInt(val: int | float, flags: dict) -> str:
     range = (-1 * 2**(flags["signlength"]-1), 2**(flags["signlength"]-1)-1)
     if val < range[0] or val > range[1]:
         return f"Signed Int {flags['signlength']}-bit: OVERFLOW!"
+    sign = ""
     if val < 0:
         val = 2 ** (flags['signlength']) + val
-    bits = bin(val)
+        sign = "-"
+    bits = bin(val)[2:]
     bits = "0" * (flags["signlength"] - len(bits)) + bits
-    return f"Signed Int {flags['signlength']}-bit: {bits}, {hex(int(bits, 2))}"
+    return f"Signed Int {flags['signlength']}-bit: {sign}0b{bits}, {sign}0x{hex(int(bits, 2))[2:]}"
 
 def reportStandard(val: int | float) -> str:
     binary, hexadecimal = None, None
@@ -77,6 +81,9 @@ def reportStandard(val: int | float) -> str:
         partHex = "0" * (4-len(partHex)) + partHex
         binary = f"{wholeBin}.{partBin}"
         hexadecimal = f"{wholeHex}.{partHex}"
+        if val < 0 and val > -1:
+            binary = f"-{binary}"
+            hexadecimal = f"-{hexadecimal}"
     elif type(val) == int:
         binary = bin(val)
         hexadecimal = hex(val)
