@@ -1,3 +1,5 @@
+import struct
+
 def nonint2decimal(left: str, right: str, entire: str) -> (str, bool | str):
     base = 16 if entire[1] == "x" else 2
     try:
@@ -9,7 +11,7 @@ def nonint2decimal(left: str, right: str, entire: str) -> (str, bool | str):
     
     
 def hex2bin(hex: str, flags: dict) -> (str, bool | str):
-    expectedSize = flags["signlength"] if flags["mode"] == "signed" else int(flags["exponent"]) + int(flags["mantissa"])
+    expectedSize = flags["signlength"] if flags["mode"] == "signed" else int(flags["exponent"]) + int(flags["mantissa"]) + 1
     binary = None
     try:
         binary = bin(int(hex, 16))[2:]
@@ -37,18 +39,28 @@ def bin2signedInt(entire: str, flags: dict) -> (str, bool | str):
         return str(val), False
 
 
-def bin2float(entire: str, flags: dict) -> (str, bool | str): #TODO TEST
+def bin2float(entire: str, flags: dict) -> (str, bool | str):
     binary, error = hex2bin(entire[2:], flags) if entire[1] == "x" else (entire[2:], False)
     if error != False:
         return None, error
+    binary = fixLength(int(entire, 0), flags["exponent"] + flags["mantissa"] + 1, 2)
+    if binary is None:
+        return None, f"{entire} is too large"
     expSize = flags["exponent"]
     manSize = flags["mantissa"]
-    
-    sign = -1 if bin[0] == "1" else 1
+    sign = -1 if binary[0] == "1" else 1
     exp = int(binary[1:(1+expSize)], 2)
-    man = int(binary[(1+expSize):(1+expSize+manSize)], 2)
-    bias = 2 ** (expSize - 1)
-    return float(sign * man * (2 ** (exp - bias)))
+    man = binary[(1+expSize):(1+expSize+manSize)]
+    man, _ = nonint2decimal("1", man, f"0b1.{man}")
+    bias = 2 ** (expSize - 1) - 1
+    return str(sign * float(man) * (2 ** (exp - bias))), False
+
+def fixLength(input: int, length: int, base: int) -> str:
+    output = bin(input)[2:] if base == 2 else hex(input)[2:]
+    if len(output) > length:
+        return None
+    return "0" * (length - len(output)) + output
+
 
 
 
@@ -90,5 +102,32 @@ def reportStandard(val: int | float) -> str:
     return f"Standard Values: {val}, {binary}, {hexadecimal}"
     
 
-def reportFloat(val, flags): #TODO
-    return f"Float Values: TODO"
+def reportFloat(val: int | float, flags: dict) -> str:
+    expSize = flags["exponent"]
+    manSize = flags["mantissa"]
+    header = f"Float ({expSize}-bit exponent, {manSize}-bit mantissa):"
+
+    if expSize > 8 or manSize > 23:
+        return f"{header}\n  Up to single precision is supported (f8,23)"
+    floatBytes = struct.pack("!f", val)
+    sign = floatBytes[0] >> 7
+    exponent = ((floatBytes[0] & 0b01111111) << 1) | (floatBytes[1] >> 7)
+    mantissa = ((floatBytes[1] & 0b01111111) << 16) | (floatBytes[2] << 8) | floatBytes[3]
+
+    exponent = exponent + 2**(expSize-1) - 2**7
+    exponent = fixLength(exponent, expSize, 2)
+    if exponent is None:
+        return f"{header} OVERFLOW"
+
+    mantissa =  fixLength(mantissa, 23, 2)
+    manTrunc = mantissa[0:manSize]
+    if len(manTrunc) != len(mantissa) and mantissa[manSize] == "1":
+        manTrunc = bin(int(manTrunc, 2) + 0b1)[2:]
+        manTrunc = fixLength(manTrunc, manSize, 2)
+    mantissa = manTrunc
+
+    length = expSize + manSize + 1
+    hexlen = int(length / 4) if length % 4 == 0 else int(length // 4 + 1)
+    binary = f"0b{sign}{exponent}{mantissa}"
+    hexadecimal = fixLength(int(binary, 2), hexlen, 16)
+    return f"{header}\n  {binary}\n  0x{hexadecimal}"

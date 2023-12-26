@@ -63,7 +63,7 @@ def parseFlags(expression: str) -> (str, dict):
     match = regex.search(r"f(\d+),(\d+)", expression)
     if match is not None:
         expression = expression.replace(match.group(0), "")
-        return expression, {"mode": "float", "exponent": match.group(1), "mantissa": match.group(2)}
+        return expression, {"mode": "float", "exponent": int(match.group(1)), "mantissa": int(match.group(2))}
     return expression, {"mode": "unsigned"}
 
 
