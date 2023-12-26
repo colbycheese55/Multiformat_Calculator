@@ -78,13 +78,13 @@ def generateOutput(val: int | float, flags: dict) -> (str):
 
 class HistoryLog:
     def __init__(this) -> None:
-        this.lastVal = None
+        this.lastExp = None
         this.history = "START OF HISTORY"
     
-    def addEntry(this, report: str, val: int | float, expression: str) -> None:
-        if val != this.lastVal:
+    def addEntry(this, report: str, expression: str) -> None:
+        if expression != this.lastExp:
             this.history = f"{expression}\n{report}\n{'_'*40}\n{this.history}"
-            this.lastVal = val
+            this.lastExp = expression
     
     def getHistory(this) -> str:
         return this.history

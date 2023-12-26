@@ -12,7 +12,7 @@ showHistory = False
 # Functions
 def solve(*args):
     expression = entryBox.get("1.0", ctk.END).replace("\n", "")
-    if len(args) > 0: # delete the extra \n
+    if len(args) > 0: # deletes the extra \n
         entryBox.delete("1.0", ctk.END)
         entryBox.insert(ctk.END, expression)
     result, flags, error = calculate(expression)
@@ -20,7 +20,7 @@ def solve(*args):
         writeResultBox(f"Error: {error}")
         return
     output = generateOutput(result, flags)
-    history.addEntry(output, result, expression)
+    history.addEntry(output, expression)
     output = history.getHistory() if showHistory is True else output
     writeResultBox(output)
 
