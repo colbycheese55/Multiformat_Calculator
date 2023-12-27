@@ -43,7 +43,7 @@ def calculate(expression: str) -> (float | int, dict, bool | str):
                 expression = expression.replace(instance, replacement)
     
     # Step 4: flag any unauthorized characters
-    invalidChars = regex.findall(r"[^+\-\/\*\.\%0-9 ]", expression)
+    invalidChars = regex.findall(r"[^+\-\/\*\.\%()0-9 ]", expression)
     if len(invalidChars) > 0:
         return None, None, f"Invalid characters were entered: {invalidChars}"
             
