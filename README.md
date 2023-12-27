@@ -27,5 +27,7 @@ Note: standard values can be in the same expression as signed ints or floats.
 **Key Binds:**
 
 _Enter_ solves the inputted expression
+
 _Control-W_ closes the calculator
+
 _Control-D_ clears the calculator
