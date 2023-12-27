@@ -40,14 +40,14 @@ def bin2signedInt(entire: str, flags: dict) -> (str, bool | str):
 
 
 def bin2float(entire: str, flags: dict) -> (str, bool | str):
+    expSize = flags["exponent"]
+    manSize = flags["mantissa"]
     binary, error = hex2bin(entire[2:], flags) if entire[1] == "x" else (entire[2:], False)
     if error != False:
         return None, error
-    binary = fixLength(int(entire, 0), flags["exponent"] + flags["mantissa"] + 1, 2)
+    binary = fixLength(int(entire, 0), expSize + manSize + 1, 2)
     if binary is None:
         return None, f"{entire} is too large"
-    expSize = flags["exponent"]
-    manSize = flags["mantissa"]
     sign = -1 if binary[0] == "1" else 1
     exp = int(binary[1:(1+expSize)], 2)
     man = binary[(1+expSize):(1+expSize+manSize)]
@@ -65,17 +65,17 @@ def fixLength(input: int, length: int, base: int) -> str:
 
 
 def reportSignedInt(val: int | float, flags: dict) -> str:
+    length = flags["signlength"]
     val = int(val)
-    range = (-1 * 2**(flags["signlength"]-1), 2**(flags["signlength"]-1)-1)
+    range = (-1 * 2**(length-1), 2**(length-1)-1)
     if val < range[0] or val > range[1]:
-        return f"Signed Int {flags['signlength']}-bit: OVERFLOW!"
-    sign = ""
+        return f"Signed Int {length}-bit: OVERFLOW!"
     if val < 0:
-        val = 2 ** (flags['signlength']) + val
-        sign = "-"
-    bits = bin(val)[2:]
-    bits = "0" * (flags["signlength"] - len(bits)) + bits
-    return f"Signed Int {flags['signlength']}-bit: {sign}0b{bits}, {sign}0x{hex(int(bits, 2))[2:]}"
+        val = 2 ** (length) + val
+    bits = fixLength(val, length, 2)
+    hexlen = int(length / 4) if length % 4 == 0 else int(length // 4 + 1)
+    hexadecimal = fixLength(val, hexlen, 16)
+    return f"Signed Int {length}-bit:\n  0b{bits}\n  0x{hexadecimal}"
 
 def reportStandard(val: int | float) -> str:
     binary, hexadecimal = None, None
@@ -87,10 +87,10 @@ def reportStandard(val: int | float) -> str:
             part = 1 - part
         wholeBin = bin(whole)
         wholeHex = hex(whole)
-        partBin = bin(int(part * 2**8))[2:]
-        partBin = "0" * (8-len(partBin)) + partBin
-        partHex = hex(int(part * 16**4))[2:]
-        partHex = "0" * (4-len(partHex)) + partHex
+        partBin = bin(int(part * 2**12))[2:]
+        partBin = "0" * (12-len(partBin)) + partBin
+        partHex = hex(int(part * 16**8))[2:]
+        partHex = "0" * (8-len(partHex)) + partHex
         binary = f"{wholeBin}.{partBin}"
         hexadecimal = f"{wholeHex}.{partHex}"
         if val < 0 and val > -1:
@@ -99,7 +99,7 @@ def reportStandard(val: int | float) -> str:
     elif type(val) == int:
         binary = bin(val)
         hexadecimal = hex(val)
-    return f"Standard Values: {val}, {binary}, {hexadecimal}"
+    return f"Standard Values:\n  {val}\n  {binary}\n  {hexadecimal}"
     
 
 def reportFloat(val: int | float, flags: dict) -> str:
@@ -122,7 +122,7 @@ def reportFloat(val: int | float, flags: dict) -> str:
     mantissa =  fixLength(mantissa, 23, 2)
     manTrunc = mantissa[0:manSize]
     if len(manTrunc) != len(mantissa) and mantissa[manSize] == "1":
-        manTrunc = bin(int(manTrunc, 2) + 0b1)[2:]
+        manTrunc = int(manTrunc, 2) + 0b1
         manTrunc = fixLength(manTrunc, manSize, 2)
     mantissa = manTrunc
 

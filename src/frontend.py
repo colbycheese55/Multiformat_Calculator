@@ -4,7 +4,8 @@ from backend import calculate, generateOutput, HistoryLog, getReadme
 
 
 root = ctk.CTk()
-root.geometry("600x500")
+root.geometry("580x500")
+root.resizable(width=False, height=False)
 root.title("Multiformat Calculator")
 history = HistoryLog()
 showHistory = False
@@ -49,7 +50,7 @@ textFont = ("Calibri", 17)
 entryBox = ctk.CTkTextbox(root, width=400, height=100, font=textFont)
 entryBox.grid(row=2, rowspan=3, column=0, columnspan=5, padx=padding, pady=padding)
 
-resultBox = ctk.CTkTextbox(root, width=400, height=300, font=textFont)
+resultBox = ctk.CTkTextbox(root, width=400, height=320, font=textFont)
 resultBox.grid(row=6, rowspan=9, column=0, columnspan=5, padx=padding, pady=padding)
 resultBox.configure(state=ctk.DISABLED)
 
