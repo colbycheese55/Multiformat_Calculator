@@ -92,7 +92,7 @@ class HistoryLog:
 def getReadme() -> str:
     try:
         text = None
-        with open("README.md") as readme:
+        with open("README.md") as readme:    # Use "..\README.md" for the exe file; to package use: pyinstaller --onefile --noconsole --add-data "README.md;."  .\src\frontend.py
             text = readme.read()
         index = text.find("How to use")
         return text[index:]
