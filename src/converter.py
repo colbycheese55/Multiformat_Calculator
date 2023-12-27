@@ -1,5 +1,7 @@
 import struct
 
+
+# INTERPRETING FUNCTIONS
 def nonint2decimal(left: str, right: str, entire: str) -> (str, bool | str):
     base = 16 if entire[1] == "x" else 2
     try:
@@ -8,22 +10,6 @@ def nonint2decimal(left: str, right: str, entire: str) -> (str, bool | str):
         return str(whole + part), False
     except Exception as e:
         return None, f"{entire} is invalid"
-    
-    
-def hex2bin(hex: str, flags: dict) -> (str, bool | str):
-    expectedSize = flags["signlength"] if flags["mode"] == "signed" else int(flags["exponent"]) + int(flags["mantissa"]) + 1
-    binary = None
-    try:
-        binary = bin(int(hex, 16))[2:]
-    except Exception as e:
-        return None, f"0x{hex}, is invalid"
-    actualSize = len(binary)
-    if expectedSize == actualSize:
-        return binary, False
-    if expectedSize > actualSize:
-        return "0" * (expectedSize - actualSize) + binary, False
-    if expectedSize < actualSize:
-        return None, f"0x{hex} represents too many bits"
     
     
 def bin2signedInt(entire: str, flags: dict) -> (str, bool | str): 
@@ -58,15 +44,8 @@ def bin2float(entire: str, flags: dict) -> (str, bool | str):
         return None, f"the result is out of bounds"
     return result, False
 
-def fixLength(input: int, length: int, base: int) -> str:
-    output = bin(input)[2:] if base == 2 else hex(input)[2:]
-    if len(output) > length:
-        return None
-    return "0" * (length - len(output)) + output
 
-
-
-
+# REPORTING FUNCTIONS
 def reportSignedInt(val: int | float, flags: dict) -> str:
     length = flags["signlength"]
     val = int(val)
@@ -80,6 +59,7 @@ def reportSignedInt(val: int | float, flags: dict) -> str:
     hexadecimal = fixLength(val, hexlen, 16)
     return f"Signed Int {length}-bit:\n  0b{bits}\n  0x{hexadecimal}"
 
+
 def reportStandard(val: int | float) -> str:
     binary, hexadecimal = None, None
     if type(val) == float:
@@ -90,10 +70,8 @@ def reportStandard(val: int | float) -> str:
             part = 1 - part
         wholeBin = bin(whole)
         wholeHex = hex(whole)
-        partBin = bin(int(part * 2**12))[2:]
-        partBin = "0" * (12-len(partBin)) + partBin
-        partHex = hex(int(part * 16**8))[2:]
-        partHex = "0" * (8-len(partHex)) + partHex
+        partBin = fixLength(int(part * 2**12), 12, 2)
+        partHex = fixLength(int(part * 16**8), 8, 16)
         binary = f"{wholeBin}.{partBin}"
         hexadecimal = f"{wholeHex}.{partHex}"
         if val < 0 and val > -1:
@@ -134,3 +112,27 @@ def reportFloat(val: int | float, flags: dict) -> str:
     binary = f"0b{sign}{exponent}{mantissa}"
     hexadecimal = fixLength(int(binary, 2), hexlen, 16)
     return f"{header}\n  {binary}\n  0x{hexadecimal}"
+
+
+# HELPER FUNCTIONS
+def hex2bin(hex: str, flags: dict) -> (str, bool | str):
+    expectedSize = flags["signlength"] if flags["mode"] == "signed" else int(flags["exponent"]) + int(flags["mantissa"]) + 1
+    binary = None
+    try:
+        binary = bin(int(hex, 16))[2:]
+    except Exception as e:
+        return None, f"0x{hex} is invalid"
+    actualSize = len(binary)
+    if expectedSize == actualSize:
+        return binary, False
+    if expectedSize > actualSize:
+        return "0" * (expectedSize - actualSize) + binary, False
+    if expectedSize < actualSize:
+        return None, f"0x{hex} represents too many bits"
+    
+
+def fixLength(input: int, length: int, base: int) -> str:
+    output = bin(input)[2:] if base == 2 else hex(input)[2:]
+    if len(output) > length:
+        return None
+    return "0" * (length - len(output)) + output

@@ -2,7 +2,6 @@ import re as regex
 from converter import nonint2decimal, bin2float, bin2signedInt, reportFloat, reportSignedInt, reportStandard
 
 
-
 def calculate(expression: str) -> (float | int, dict, bool | str):
     expression = expression.lower().replace("\n", "")
     if expression == "":
@@ -44,7 +43,7 @@ def calculate(expression: str) -> (float | int, dict, bool | str):
                 expression = expression.replace(instance, replacement)
     
     # Step 4: flag any unauthorized characters
-    invalidChars = regex.findall(r"[^+\-\/\*\.0-9 ]", expression)
+    invalidChars = regex.findall(r"[^+\-\/\*\.\%0-9 ]", expression)
     if len(invalidChars) > 0:
         return None, None, f"Invalid characters were entered: {invalidChars}"
             
@@ -57,17 +56,17 @@ def calculate(expression: str) -> (float | int, dict, bool | str):
 
 def parseFlags(expression: str) -> (str, dict):
     match = regex.search(r"s(\d+)", expression)
-    if match is not None:
+    if match:
         expression = expression.replace(match.group(0), "")
         return expression, {"mode": "signed", "signlength": int(match.group(1))}
     match = regex.search(r"f(\d+),(\d+)", expression)
-    if match is not None:
+    if match:
         expression = expression.replace(match.group(0), "")
         return expression, {"mode": "float", "exponent": int(match.group(1)), "mantissa": int(match.group(2))}
     return expression, {"mode": "unsigned"}
 
 
-def generateOutput(val: int | float, flags: dict) -> (str):
+def generateOutput(val: int | float, flags: dict) -> str:
     out = reportStandard(val) + "\n"
     if flags["mode"] == "signed":
         out += reportSignedInt(val, flags)

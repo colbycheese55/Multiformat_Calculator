@@ -16,7 +16,12 @@ def solve(*args):
     if len(args) > 0: # deletes the extra \n
         entryBox.delete("1.0", ctk.END)
         entryBox.insert(ctk.END, expression)
-    result, flags, error = calculate(expression)
+    result, flags, error = None, None, None
+    try:
+        result, flags, error = calculate(expression)
+    except Exception as e:
+        writeResultBox("An unknown error occurred")
+        return
     if error is not False:
         writeResultBox(f"Error: {error}")
         return
