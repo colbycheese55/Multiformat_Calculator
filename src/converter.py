@@ -53,7 +53,10 @@ def bin2float(entire: str, flags: dict) -> (str, bool | str):
     man = binary[(1+expSize):(1+expSize+manSize)]
     man, _ = nonint2decimal("1", man, f"0b1.{man}")
     bias = 2 ** (expSize - 1) - 1
-    return str(sign * float(man) * (2 ** (exp - bias))), False
+    result = str(sign * float(man) * (2 ** (exp - bias)))
+    if result.find("e") != -1:
+        return None, f"the result is out of bounds"
+    return result, False
 
 def fixLength(input: int, length: int, base: int) -> str:
     output = bin(input)[2:] if base == 2 else hex(input)[2:]
