@@ -13,7 +13,7 @@ def nonint2decimal(left: str, right: str, entire: str) -> (str, bool | str):
     
     
 def bin2signedInt(entire: str, flags: dict) -> (str, bool | str): 
-    binary, error = hex2bin(entire[2:], flags) if entire[1] == "x" else (entire[2:], False)
+    binary, error = hex2bin(entire[2:], flags) if entire[1] == "x" else checkBin(entire[2:])
     if error != False:
         return None, error
     val = int(binary, 2)
@@ -28,7 +28,7 @@ def bin2signedInt(entire: str, flags: dict) -> (str, bool | str):
 def bin2float(entire: str, flags: dict) -> (str, bool | str):
     expSize = flags["exponent"]
     manSize = flags["mantissa"]
-    binary, error = hex2bin(entire[2:], flags) if entire[1] == "x" else (entire[2:], False)
+    binary, error = hex2bin(entire[2:], flags) if entire[1] == "x" else checkBin(entire[2:])
     if error != False:
         return None, error
     binary = fixLength(int(entire, 0), expSize + manSize + 1, 2)
@@ -136,3 +136,11 @@ def fixLength(input: int, length: int, base: int) -> str:
     if len(output) > length:
         return None
     return "0" * (length - len(output)) + output
+
+
+def checkBin(binary: str) -> (str, bool | str):
+    try:
+        int(binary, 2)
+    except Exception as e:
+        return None, f"0b{binary} is invalid"
+    return binary, False
