@@ -1,4 +1,5 @@
 import re as regex
+import os
 from converter import nonint2decimal, bin2float, bin2signedInt, reportFloat, reportSignedInt, reportStandard
 
 
@@ -90,11 +91,15 @@ class HistoryLog:
     
 
 def getReadme() -> str:
+    TESTING = True
+    path = "README.md" if TESTING else os.path.abspath(os.path.join(os.path.dirname(__file__), "README.md"))
     try:
         text = None
-        with open("README.md") as readme:    # Use "..\README.md" for the exe file; to package use: pyinstaller --onefile --noconsole --add-data "README.md;."  .\src\frontend.py
+        with open(path) as readme:
             text = readme.read()
         index = text.find("How to use")
         return text[index:]
     except Exception as e:
         return "COULD NOT OPEN README"
+
+# to package use: pyinstaller --onefile --noconsole --add-data "README.md;."  .\src\frontend.py
